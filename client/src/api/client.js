@@ -1,7 +1,9 @@
 // All API calls go through the Vite proxy → Express backend.
 // The frontend never talks to GitHub or the AI provider directly.
 
-const BASE = "/api";
+const BASE = import.meta.env.VITE_API_BASE
+  ? import.meta.env.VITE_API_BASE + "/api"
+  : "/api";
 
 async function apiFetch(url, options = {}) {
   const res = await fetch(BASE + url, options);
