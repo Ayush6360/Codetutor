@@ -12,10 +12,7 @@ const PORT = process.env.PORT || 8787;
 
 // CORS — allow the Vite dev server on port 5173 (and any localhost for dev)
 app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || origin.startsWith("http://localhost")) return cb(null, true);
-    cb(new Error("Not allowed by CORS"));
-  },
+  origin: "*"
 }));
 
 // Body parsing with a 1 MB limit
