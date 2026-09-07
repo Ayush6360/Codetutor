@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SkeletonExplain, SkeletonNotes, SkeletonQuiz } from "./Skeleton.jsx";
 import ExplainView from "./ExplainView.jsx";
 import NotesView from "./NotesView.jsx";
 import QuizView from "./QuizView.jsx";
@@ -12,7 +13,6 @@ export default function FileViewer({ file, content, repo }) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
 
-  // Cache results so we don't re-call AI on tab switch
   const [explanation, setExplanation] = useState(null);
   const [notes, setNotes] = useState(null);
   const [questions, setQuestions] = useState(null);
@@ -81,16 +81,9 @@ export default function FileViewer({ file, content, repo }) {
       </nav>
 
       <div className="file-viewer__body">
-        {aiLoading && (
-          <div className="loading-state">
-            <div className="loading-state__spinner" />
-            <p className="loading-state__text">
-              {activeTab === "explain" && "Analyzing code line by line…"}
-              {activeTab === "notes" && "Generating study notes…"}
-              {activeTab === "quiz" && "Creating quiz questions…"}
-            </p>
-          </div>
-        )}
+        {aiLoading && activeTab === "explain" && <SkeletonExplain />}
+        {aiLoading && activeTab === "notes"   && <SkeletonNotes />}
+        {aiLoading && activeTab === "quiz"    && <SkeletonQuiz />}
 
         {aiError && !aiLoading && (
           <div className="error-banner">
@@ -98,7 +91,7 @@ export default function FileViewer({ file, content, repo }) {
           </div>
         )}
 
-        {!aiLoading && !aiError && (
+        {!aiError && (
           <>
             {activeTab === "code" && (
               <pre className="code-block">
@@ -113,15 +106,15 @@ export default function FileViewer({ file, content, repo }) {
               </pre>
             )}
 
-            {activeTab === "explain" && explanation && (
+            {activeTab === "explain" && !aiLoading && explanation && (
               <ExplainView explanation={explanation} />
             )}
 
-            {activeTab === "notes" && notes && (
+            {activeTab === "notes" && !aiLoading && notes && (
               <NotesView notes={notes} />
             )}
 
-            {activeTab === "quiz" && questions && (
+            {activeTab === "quiz" && !aiLoading && questions && (
               <QuizView
                 questions={questions}
                 repo={repo}
