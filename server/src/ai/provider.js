@@ -71,11 +71,12 @@ function isRetryable(err) {
 }
 
 function makeClient() {
+  const timeoutMs = Number(process.env.AI_TIMEOUT_MS) || 20_000;
   return new OpenAI({
     apiKey: process.env.AI_API_KEY,
     baseURL:
       process.env.AI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai",
-    timeout: 45_000, // hard cap so a hung model doesn't lock the request
+    timeout: timeoutMs, // hard cap so a hung model doesn't lock the request
   });
 }
 

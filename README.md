@@ -40,6 +40,41 @@ The server uses a fallback chain of free Gemini models — if one is rate-limite
 
 Override via the `AI_MODELS` env var (comma-separated). Single `AI_MODEL` is also supported for back-compat and is prepended to the chain. Each response includes the name of the model that actually answered.
 
+## 🚀 Deploy to Vercel
+
+The repo ships with `vercel.json` and is configured for a single Vercel project. Before you deploy, set these env vars in **Project Settings → Environment Variables**:
+
+| Name | Value |
+|---|---|
+| `AI_API_KEY` | Your Google Gemini API key |
+| `AI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` |
+| `AI_MODEL` (optional) | `gemini-3.8-flash` |
+| `AI_MODELS` (optional) | Comma-separated override of the fallback chain |
+| `AI_TIMEOUT_MS` (optional) | `20000` (Vercel Hobby users: `8000`) |
+| `GITHUB_TOKEN` (optional) | Personal access token to raise GitHub rate limits |
+
+**Important:** Vercel serverless functions cap at 60s on Pro and 10s on Hobby. If you're on Hobby, set `AI_TIMEOUT_MS=8000` so a single model attempt can't blow the budget. Each failed model takes the full timeout before falling through, so a long chain on Hobby will hit the function cap.
+
+## 🧪 Run locally
+
+In one terminal:
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+In another:
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Then open `http://localhost:5173`. The Vite dev server proxies `/api/*` to the Express backend on port 8787.
+
 ## 🚀 Live Demo
 
 Coming soon.
