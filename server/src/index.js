@@ -4,6 +4,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import githubRouter from "./routes/github.js";
 import aiRouter from "./routes/ai.js";
+import { getAvailableModels } from "./ai/provider.js";
 
 const app = express();
 const PORT = process.env.PORT || 8787;
@@ -46,7 +47,8 @@ app.use((err, _req, res, _next) => {
 // ── Start ────────────────────────────────────────────────────────────────────
 
 app.listen(PORT, () => {
+  const chain = getAvailableModels();
   console.log(`✅ CodeTutor server running at http://localhost:${PORT}`);
-  console.log(`   Model: ${process.env.AI_MODEL || "gpt-4o-mini"}`);
+  console.log(`   Models (in order): ${chain.join(" → ")}`);
   console.log(`   Base URL: ${process.env.AI_BASE_URL || "(default OpenAI)"}`);
 });

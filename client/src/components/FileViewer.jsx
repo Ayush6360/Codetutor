@@ -12,6 +12,7 @@ export default function FileViewer({ file, content, repo }) {
   const [activeTab, setActiveTab] = useState("code");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
+  const [model, setModel] = useState(null);
 
   const [explanation, setExplanation] = useState(null);
   const [notes, setNotes] = useState(null);
@@ -26,6 +27,7 @@ export default function FileViewer({ file, content, repo }) {
       try {
         const data = await explainCode(repo, file.path, content);
         setExplanation(data.explanation);
+        if (data.model) setModel(data.model);
       } catch (err) {
         setAiError(err.message);
       } finally {
@@ -38,6 +40,7 @@ export default function FileViewer({ file, content, repo }) {
       try {
         const data = await generateNotes(repo, file.path, content);
         setNotes(data.notes);
+        if (data.model) setModel(data.model);
       } catch (err) {
         setAiError(err.message);
       } finally {
@@ -50,6 +53,7 @@ export default function FileViewer({ file, content, repo }) {
       try {
         const data = await generateQuiz(file.path, content);
         setQuestions(data.questions);
+        if (data.model) setModel(data.model);
       } catch (err) {
         setAiError(err.message);
       } finally {
@@ -64,7 +68,14 @@ export default function FileViewer({ file, content, repo }) {
     <div className="file-viewer">
       <header className="file-viewer__header">
         <span className="file-viewer__path">{file.path}</span>
-        <span className="file-viewer__meta">{lines.length} lines</span>
+        <span className="file-viewer__meta">
+          {lines.length} lines
+          {model && (
+            <span className="file-viewer__model" title="Model that answered this request">
+              · {model}
+            </span>
+          )}
+        </span>
       </header>
 
       <nav className="file-viewer__tabs">

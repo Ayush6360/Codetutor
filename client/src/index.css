@@ -298,6 +298,20 @@ code, pre {
   font-size: 12px;
   color: var(--text-dim);
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-viewer__model {
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  opacity: 0.85;
 }
 
 .file-viewer__tabs {

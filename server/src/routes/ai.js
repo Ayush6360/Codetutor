@@ -1,8 +1,14 @@
 import { Router } from "express";
-import { chat } from "../ai/provider.js";
+import { chat, getAvailableModels } from "../ai/provider.js";
 import { saveAnalysis, saveQuizResult } from "../db/database.js";
 
 const router = Router();
+
+// ── GET /api/ai/models ───────────────────────────────────────────────────────
+// Lists the configured model chain so the client can show it.
+router.get("/models", (_req, res) => {
+  res.json({ models: getAvailableModels() });
+});
 
 // Helper: add line numbers to code for the prompt
 function withLineNumbers(code) {
@@ -19,7 +25,7 @@ router.post("/explain", async (req, res) => {
 
   try {
     const numbered = withLineNumbers(code);
-    const explanation = await chat([
+    const { data: explanation, model } = await chat([
       {
         role: "system",
         content: `You are a patient programming tutor. Explain code to a student who is learning to code.
@@ -47,7 +53,7 @@ Skip blank lines and comment-only lines unless they're important.`,
       await saveAnalysis(repo, path, "explain", explanation);
     }
 
-    return res.json({ explanation });
+    return res.json({ explanation, model });
   } catch (err) {
     console.error("AI /explain error:", err.message);
     return res.status(500).json({ error: "AI request failed: " + err.message });
@@ -60,7 +66,7 @@ router.post("/notes", async (req, res) => {
   if (!code) return res.status(400).json({ error: "code is required." });
 
   try {
-    const notes = await chat([
+    const { data: notes, model } = await chat([
       {
         role: "system",
         content: `You are a study notes generator. Create concise, well-structured Markdown notes 
@@ -89,7 +95,7 @@ Format everything in clean Markdown with headers, bold text, and bullet points.`
       await saveAnalysis(repo, path, "notes", notes);
     }
 
-    return res.json({ notes });
+    return res.json({ notes, model });
   } catch (err) {
     console.error("AI /notes error:", err.message);
     return res.status(500).json({ error: "AI request failed: " + err.message });
@@ -102,7 +108,7 @@ router.post("/quiz", async (req, res) => {
   if (!code) return res.status(400).json({ error: "code is required." });
 
   try {
-    const result = await chat(
+    const { data: result, model } = await chat(
       [
         {
           role: "system",
@@ -149,7 +155,7 @@ ${code}
       throw new Error("AI returned invalid quiz structure.");
     }
 
-    return res.json({ questions: result.questions });
+    return res.json({ questions: result.questions, model });
   } catch (err) {
     console.error("AI /quiz error:", err.message);
     return res.status(500).json({ error: "AI request failed: " + err.message });
